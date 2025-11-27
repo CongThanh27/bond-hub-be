@@ -1,3 +1,4 @@
+// Ghi chú: Tệp TypeScript thuộc module Qr Code, chứa logic hỗ trợ hoặc hằng số cần thiết.
 // src/tasks/qr-code.cleanup.ts
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';

@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang='vi'>
+<head>
+<meta charset='UTF-8'>
+<title>Đặc tả Use Case BondHub</title>
+<style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; line-height: 1.55; color: #1f2933; margin: 40px; }
+    h1 { color: #0f172a; margin-bottom: 4px; }
+    h2 { color: #0f172a; border-bottom: 2px solid #e5e7eb; padding-bottom: 4px; margin-top: 32px; }
+    h3 { color: #111827; margin-bottom: 6px; }
+    .meta { color: #475467; margin-top: 0; }
+    .usecase { margin: 16px 0 24px; padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 8px; background: #fafbfc; }
+    .label { font-weight: 600; color: #111827; }
+    ul, ol { margin: 6px 0 12px 20px; }
+    code { background: #f3f4f6; padding: 1px 4px; border-radius: 4px; }
+    .diagrams code { display: inline-block; margin-right: 6px; }
+    a { color: #2563eb; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+<h1>Đặc tả Use Case BondHub</h1>
+<p class='meta'>Nguồn tham chiếu: sơ đồ trong <code>docs</code> và ảnh sinh ra tại <code>out/docs</code>. Nội dung tóm tắt theo từng use case chính.</p>
+<h2>Mục lục</h2>
+<ul>
+<li><a href='#auth'>Xác thực</a><ul>
+<li><a href='#dang-ky'>Đăng ký</a></li>
+<li><a href='#dang-nhap'>Đăng nhập</a></li>
+<li><a href='#dang-xuat'>Đăng xuất</a></li>
+</ul></li>
+<li><a href='#contacts-friends'>Danh bạ & Bạn bè</a><ul>
+<li><a href='#dong-bo-danh-ba'>Đồng bộ danh bạ</a></li>
+<li><a href='#tim-kiem-nguoi-dung'>Tìm kiếm người dùng</a></li>
+<li><a href='#gui-loi-moi-ket-ban'>Gửi lời mời kết bạn</a></li>
+<li><a href='#phan-hoi-loi-moi'>Phản hồi lời mời kết bạn</a></li>
+<li><a href='#huy-loi-moi'>Hủy lời mời đã gửi</a></li>
+<li><a href='#xem-danh-sach-ban-be'>Xem danh sách bạn bè</a></li>
+</ul></li>
+<li><a href='#groups'>Quản lý nhóm</a><ul>
+<li><a href='#tao-nhom'>Tạo nhóm</a></li>
+<li><a href='#moi-thanh-vien'>Mời thành viên vào nhóm</a></li>
+<li><a href='#tham-gia-nhom'>Tham gia nhóm bằng link/QR</a></li>
+<li><a href='#roi-nhom'>Rời nhóm</a></li>
+<li><a href='#xoa-thanh-vien'>Xóa thành viên khỏi nhóm</a></li>
+<li><a href='#cap-nhat-nhom'>Cập nhật thông tin/avatar nhóm</a></li>
+<li><a href='#phan-quyen'>Phân quyền vai trò</a></li>
+<li><a href='#giai-tan-nhom'>Giải tán nhóm</a></li>
+</ul></li>
+<li><a href='#direct-chat'>Chat trực tiếp</a><ul>
+<li><a href='#danh-sach-cuoc-tro-chuyen'>Xem danh sách cuộc trò chuyện</a></li>
+<li><a href='#xem-lich-su-chat-ca-nhan'>Xem lịch sử chat cá nhân</a></li>
+<li><a href='#gui-tin-nhan-ca-nhan'>Gửi tin nhắn cá nhân (kèm file)</a></li>
+<li><a href='#dang-go-ca-nhan'>Trạng thái đang gõ - cá nhân</a></li>
+<li><a href='#da-doc-ca-nhan'>Đánh dấu đã đọc - cá nhân</a></li>
+<li><a href='#thu-hoi-ca-nhan'>Thu hồi tin nhắn cá nhân</a></li>
+<li><a href='#reaction-ca-nhan'>Thêm reaction cho tin nhắn</a></li>
+</ul></li>
+<li><a href='#group-chat'>Chat nhóm</a><ul>
+<li><a href='#xem-lich-su-chat-nhom'>Xem lịch sử chat nhóm</a></li>
+<li><a href='#gui-tin-nhan-nhom'>Gửi tin nhắn nhóm (kèm file)</a></li>
+<li><a href='#dang-go-nhom'>Trạng thái đang gõ - nhóm</a></li>
+<li><a href='#da-doc-nhom'>Đánh dấu đã đọc - nhóm</a></li>
+</ul></li>
+</ul>
+<h2 id='auth'>Xác thực</h2>
+<div class='usecase' id='dang-ky'>
+<h3>Đăng ký</h3>
+<p>Đăng ký tài khoản mới qua email hoặc số điện thoại với xác thực OTP.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người dùng chưa có tài khoản trong hệ thống.</li><li>Có email hoặc số điện thoại hợp lệ và có thể nhận OTP.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Tạo bản ghi người dùng, thông tin cá nhân và thiết lập mặc định.</li><li>OTP và dữ liệu đăng ký tạm được xóa để tránh tái sử dụng.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng nhập email/số điện thoại trên ứng dụng.</li><li>Frontend gửi <code>POST /auth/register/initiate</code>; dịch vụ kiểm tra trùng, tạo <em>registrationId</em> kèm OTP và gửi qua email/SMS.</li><li>Người dùng nhập OTP; backend xác thực <code>/auth/register/verify</code> và giữ phiên đăng ký hợp lệ.</li><li>Người dùng nhập thông tin cá nhân, mật khẩu; frontend gửi <code>/auth/register/complete</code> cùng <em>registrationId</em>.</li><li>Dịch vụ băm mật khẩu, tạo bản ghi <code>users</code>/<code>user_info</code>/<code>settings</code>, dọn cache OTP/registration.</li><li>Trả về thông báo đăng ký thành công để người dùng tiếp tục đăng nhập.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Email/Số điện thoại đã tồn tại:</strong><ol><li>Trả 400 Bad Request với thông báo đã được đăng ký.</li></ol></li><li><strong>OTP sai hoặc hết hạn:</strong><ol><li>Trả 400 Bad Request và yêu cầu nhập lại/mời đăng ký lại.</li></ol></li><li><strong>Phiên đăng ký không còn hiệu lực:</strong><ol><li>Khi không tìm thấy dữ liệu registration trong cache, trả 400 Bad Request.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/auth/register/register_activity.puml</code></li><li><code>docs/auth/register/register_sequence.puml</code></li><li><code>out/docs/auth/register/register_activity/Đăng ký - Activity Diagram.png</code></li><li><code>out/docs/auth/register/register_sequence/Đăng ký - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='dang-nhap'>
+<h3>Đăng nhập</h3>
+<p>Xác thực người dùng bằng email/số điện thoại và mật khẩu, phát hành token.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Tài khoản đã được đăng ký.</li><li>Thiết bị có kết nối mạng và cho phép lưu token.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Trả về access token (JWT) và refresh token kèm thông tin người dùng.</li><li>Refresh token được lưu trong database để kiểm soát phiên.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng nhập thông tin đăng nhập và chọn loại thiết bị.</li><li>Frontend gọi <code>POST /auth/login</code>.</li><li>AuthService tìm người dùng bằng email/phone, so khớp mật khẩu bằng bcrypt.</li><li>Sinh access token (JWT) chứa <em>deviceType</em>, tạo refresh token (UUID) và lưu DB.</li><li>Trả token + thông tin người dùng; frontend lưu và chuyển tới màn hình chính.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Không tìm thấy người dùng:</strong><ol><li>Trả 401 Unauthorized với thông báo thông tin không hợp lệ.</li></ol></li><li><strong>Sai mật khẩu:</strong><ol><li>Trả 401 Unauthorized với thông báo thông tin không hợp lệ.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/auth/login/login_activity.puml</code></li><li><code>docs/auth/login/login_sequence.puml</code></li><li><code>out/docs/auth/login/login_activity/Đăng nhập - Activity Diagram.png</code></li><li><code>out/docs/auth/login/login_sequence/Đăng nhập - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='dang-xuat'>
+<h3>Đăng xuất</h3>
+<p>Thu hồi refresh token và ngắt kết nối phiên hiện tại qua WebSocket.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người dùng đã đăng nhập và gửi kèm refresh token.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Refresh token bị đánh dấu <code>isRevoked=true</code>.</li><li>Thiết bị nhận sự kiện <code>force_logout</code>; frontend xóa token cục bộ.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng chọn đăng xuất; frontend gửi <code>POST /auth/logout</code> với header refresh-token.</li><li>Dịch vụ kiểm tra token tồn tại và chưa bị thu hồi.</li><li>Cập nhật bản ghi refresh token thành revoked.</li><li>Qua <code>AuthGateway</code> phát sự kiện <code>force_logout</code> tới thiết bị tương ứng.</li><li>Phản hồi 200 OK, client xóa token và chuyển về màn đăng nhập.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Thiếu refresh token:</strong><ol><li>Trả 401 Unauthorized và hiển thị yêu cầu đăng nhập lại.</li></ol></li><li><strong>Token không hợp lệ/đã thu hồi:</strong><ol><li>Trả 401 Unauthorized với thông báo refresh token không hợp lệ.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/auth/logout/logout_activity.puml</code></li><li><code>docs/auth/logout/logout_sequence.puml</code></li><li><code>out/docs/auth/logout/logout_activity/Đăng xuất - Activity Diagram.png</code></li><li><code>out/docs/auth/logout/logout_sequence/Đăng xuất - Sequence Diagram.png</code></li></ul>
+</div>
+<h2 id='contacts-friends'>Danh bạ & Bạn bè</h2>
+<div class='usecase' id='dong-bo-danh-ba'>
+<h3>Đồng bộ danh bạ</h3>
+<p>Đồng bộ danh bạ thiết bị và ánh xạ sang tài khoản hệ thống.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người dùng đã đăng nhập.</li><li>Ứng dụng được cấp quyền đọc danh bạ trên thiết bị.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Danh bạ trong DB được thêm/sửa/xóa theo thiết bị.</li><li>Trả về số lượng liên hệ được tạo mới và bị xóa.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng chọn đồng bộ; ứng dụng đọc danh bạ và gửi <code>POST /contacts/sync</code> với danh sách {name, phone}.</li><li>Backend tải danh bạ hiện tại của người dùng, tạo map theo số điện thoại.</li><li>Tra cứu các số trùng trong bảng <code>users</code> để gắn <code>contactUserId</code>.</li><li>Tính toán mục cần tạo mới và cần xóa; thực hiện trong transaction.</li><li>Trả về kết quả (created/deleted); người dùng có thể gọi <code>GET /contacts</code> để xem danh sách đã xử lý.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Danh bạ trống hoặc không có số hợp lệ:</strong><ol><li>Không thay đổi dữ liệu, trả về kết quả rỗng.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/contact/sync/contact_sync_activity.puml</code></li><li><code>docs/contact/sync/contact_sync_sequence.puml</code></li><li><code>out/docs/contact/sync/contact_sync_activity/Đồng bộ danh bạ - Activity Diagram.png</code></li><li><code>out/docs/contact/sync/contact_sync_sequence/Đồng bộ danh bạ - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='tim-kiem-nguoi-dung'>
+<h3>Tìm kiếm người dùng</h3>
+<p>Tìm tài khoản khác bằng email/số điện thoại hoặc QR/ID và xem trạng thái quan hệ.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người dùng đã đăng nhập.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Hiển thị thông tin người dùng tìm thấy cùng trạng thái quan hệ (chưa kết bạn/đã gửi lời mời/đã là bạn).</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Nhập email/số điện thoại và gửi <code>POST /users/search</code>.</li><li>UserService tìm user phù hợp và lấy quan hệ bạn bè nếu có.</li><li>Trả về thông tin người dùng + quan hệ; frontend hiển thị kết quả.</li><li>Hoặc quét QR/nhập ID rồi gọi <code>GET /users/:id</code> để lấy dữ liệu tương tự.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Không tìm thấy hoặc người dùng không cho phép tìm kiếm:</strong><ol><li>Trả 404 Not Found với thông báo không tìm thấy người dùng.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/friend/search/search_activity.puml</code></li><li><code>docs/friend/search/search_sequence.puml</code></li><li><code>out/docs/friend/search/search_activity/Tìm kiếm người dùng - Activity Diagram.png</code></li><li><code>out/docs/friend/search/search_sequence/Tìm kiếm người dùng - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='gui-loi-moi-ket-ban'>
+<h3>Gửi lời mời kết bạn</h3>
+<p>Gửi yêu cầu kết bạn với lời giới thiệu tùy chọn.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người gửi và người nhận tồn tại trong hệ thống.</li><li>Chưa có quan hệ bạn bè hoặc lời mời đang tồn tại giữa hai bên.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Tạo bản ghi lời mời trạng thái PENDING, phát sự kiện reload qua WebSocket cho hai bên.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng chọn người nhận, nhập lời giới thiệu (nếu có).</li><li>Gọi <code>POST /friends/request</code> với <em>receiverId</em>.</li><li>Service kiểm tra định dạng UUID, kiểm tra tồn tại người dùng và quan hệ hiện tại.</li><li>Nếu hợp lệ, tạo bản ghi <code>friends</code> (status=PENDING, introduce).</li><li>Emit sự kiện reload tới sender/receiver; trả về dữ liệu lời mời.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>ID không hợp lệ:</strong><ol><li>Trả 400 Bad Request.</li></ol></li><li><strong>Người dùng không tồn tại:</strong><ol><li>Trả 404 Not Found.</li></ol></li><li><strong>Đã có quan hệ hoặc lời mời:</strong><ol><li>Trả 400 Bad Request với thông báo tương ứng.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/friend/request/friend_request_activity.puml</code></li><li><code>docs/friend/request/friend_request_sequence.puml</code></li><li><code>out/docs/friend/request/friend_request_activity/Gửi lời mời kết bạn - Activity Diagram.png</code></li><li><code>out/docs/friend/request/friend_request_sequence/Gửi lời mời kết bạn - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='phan-hoi-loi-moi'>
+<h3>Phản hồi lời mời kết bạn</h3>
+<p>Chấp nhận hoặc từ chối lời mời đến.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Lời mời tồn tại và người thực hiện là người nhận.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Cập nhật trạng thái lời mời, phát sự kiện reload cho hai bên.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng chọn lời mời và trạng thái phản hồi.</li><li>Gọi <code>PUT /friends/respond</code> với <em>requestId</em> và <em>status</em>.</li><li>Service kiểm tra UUID, tìm lời mời, xác nhận requester là người nhận.</li><li>Cập nhật status (ACCEPTED/REJECTED), emit reload, trả về bản ghi đã cập nhật.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>ID không hợp lệ:</strong><ol><li>Trả 400 Bad Request.</li></ol></li><li><strong>Lời mời không tồn tại:</strong><ol><li>Trả 404 Not Found.</li></ol></li><li><strong>Không phải người nhận:</strong><ol><li>Trả 403 Forbidden.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/friend/respond/friend_respond_activity.puml</code></li><li><code>docs/friend/respond/friend_respond_sequence.puml</code></li><li><code>out/docs/friend/respond/friend_respond_activity/Phản hồi lời mời kết bạn - Activity Diagram.png</code></li><li><code>out/docs/friend/respond/friend_respond_sequence/Phản hồi lời mời kết bạn - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='huy-loi-moi'>
+<h3>Hủy lời mời đã gửi</h3>
+<p>Người gửi hủy bỏ lời mời kết bạn chưa được phản hồi.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Lời mời tồn tại và đang ở trạng thái chờ.</li><li>Người thực hiện là người gửi lời mời.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Bản ghi lời mời bị xóa; sự kiện reload gửi đến hai bên.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng chọn lời mời muốn hủy.</li><li>Gọi <code>DELETE /friends/request/{requestId}</code>.</li><li>Service kiểm tra UUID, tìm lời mời, xác nhận requester là sender.</li><li>Xóa bản ghi, emit reload và trả về thông điệp thành công.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>ID không hợp lệ:</strong><ol><li>Trả 400 Bad Request.</li></ol></li><li><strong>Lời mời không tồn tại:</strong><ol><li>Trả 404 Not Found.</li></ol></li><li><strong>Không phải người gửi:</strong><ol><li>Trả 403 Forbidden.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/friend/cancel/friend_cancel_activity.puml</code></li><li><code>docs/friend/cancel/friend_cancel_sequence.puml</code></li><li><code>out/docs/friend/cancel/friend_cancel_activity/Hủy lời mời kết bạn - Activity Diagram.png</code></li><li><code>out/docs/friend/cancel/friend_cancel_sequence/Hủy lời mời kết bạn - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='xem-danh-sach-ban-be'>
+<h3>Xem danh sách bạn bè</h3>
+<p>Liệt kê các quan hệ bạn bè đã được chấp nhận.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người dùng đã đăng nhập.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Hiển thị danh sách bạn bè và thông tin liên quan.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng mở màn hình bạn bè; frontend gọi <code>GET /friends/list</code>.</li><li>Service kiểm tra định dạng userId, truy vấn quan hệ status=ACCEPTED (sender/receiver).</li><li>Định dạng dữ liệu trả về; frontend hiển thị danh sách.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>userId không hợp lệ:</strong><ol><li>Trả 400 Bad Request.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/friend/list/friend_list_activity.puml</code></li><li><code>docs/friend/list/friend_list_sequence.puml</code></li><li><code>out/docs/friend/list/friend_list_activity/Xem danh sách bạn bè - Activity Diagram.png</code></li><li><code>out/docs/friend/list/friend_list_sequence/Xem danh sách bạn bè - Sequence Diagram.png</code></li></ul>
+</div>
+<h2 id='groups'>Quản lý nhóm</h2>
+<div class='usecase' id='tao-nhom'>
+<h3>Tạo nhóm</h3>
+<p>Tạo nhóm mới, đặt avatar và thêm thành viên ban đầu.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người dùng đã đăng nhập.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Nhóm mới được tạo, người tạo là trưởng nhóm; các thành viên được thêm và nhận thông báo.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Nhập tên nhóm, chọn avatar (tùy chọn) và danh sách thành viên.</li><li>Gửi <code>POST /groups</code> (FormData).</li><li>Nếu có file, kiểm tra định dạng và upload lên kho lưu trữ.</li><li>Tạo bản ghi nhóm, thêm người tạo với vai trò LEADER, thêm các thành viên còn lại vai trò MEMBER.</li><li>Phát sự kiện <code>addedToGroup</code>/ <code>group_member_added</code> tới các thành viên qua WebSocket/EventService.</li><li>Trả về thông tin nhóm và danh sách thành viên.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Định dạng avatar không hợp lệ:</strong><ol><li>Trả 400 Bad Request và không tạo nhóm.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/group/create/create_group_activity.puml</code></li><li><code>docs/group/create/create_group_sequence.puml</code></li><li><code>out/docs/group/create/create_group_activity/Tạo nhóm - Activity Diagram.png</code></li><li><code>out/docs/group/create/create_group_sequence/Tạo nhóm - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='moi-thanh-vien'>
+<h3>Mời thành viên vào nhóm</h3>
+<p>Thêm người dùng mới vào nhóm hiện có.</p>
+<p><span class='label'>Actor:</span> Trưởng nhóm, Phó nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người thêm là thành viên có quyền (LEADER/CO_LEADER).</li><li>Nhóm tồn tại.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Thành viên mới được tạo vai trò MEMBER, nhận thông báo qua WebSocket.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Chọn nhóm và người cần thêm; gọi <code>POST /groups/members</code>.</li><li>Xác thực quyền của người thêm (đang ở trong nhóm và đủ quyền).</li><li>Kiểm tra người được thêm chưa là thành viên; tạo bản ghi group_member.</li><li>Lấy thông tin người dùng mới, phát sự kiện <code>member_added</code>/<code>group_member_added</code>.</li><li>Trả về thông tin thành viên đã thêm.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Không có quyền thêm:</strong><ol><li>Trả 403 Forbidden.</li></ol></li><li><strong>Người dùng đã là thành viên:</strong><ol><li>Trả 400 Bad Request.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/group/invite/invite_member_activity.puml</code></li><li><code>docs/group/invite/invite_member_sequence.puml</code></li><li><code>out/docs/group/invite/invite_member_activity/Mời thành viên vào nhóm - Activity Diagram.png</code></li><li><code>out/docs/group/invite/invite_member_sequence/Mời thành viên vào nhóm - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='tham-gia-nhom'>
+<h3>Tham gia nhóm bằng link/QR</h3>
+<p>Người dùng tự gia nhập nhóm thông qua mã QR hoặc link chứa ID nhóm.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Nhóm tồn tại và cho phép gia nhập.</li><li>Người dùng chưa là thành viên.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Người dùng được thêm vào nhóm với vai trò MEMBER và nhận thông báo.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Quét QR hoặc mở link để lấy <em>groupId</em>; gọi <code>GET /groups/:id/info</code> để xem thông tin nhóm.</li><li>Chọn tham gia; frontend gửi <code>POST /groups/join</code> với <em>groupId</em>.</li><li>Service kiểm tra nhóm tồn tại và người dùng chưa là thành viên.</li><li>Tạo bản ghi group_member, lấy thông tin người dùng, phát sự kiện <code>member_added</code>/<code>group_member_added</code>.</li><li>Trả về thông tin thành viên mới; frontend hiển thị thành công.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Nhóm không tồn tại:</strong><ol><li>Trả 404 Not Found.</li></ol></li><li><strong>Đã là thành viên:</strong><ol><li>Trả 400 Bad Request với thông báo tương ứng.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/group/join/join_group_activity.puml</code></li><li><code>docs/group/join/join_group_sequence.puml</code></li><li><code>out/docs/group/join/join_group_activity/Tham gia nhóm bằng QR code - Activity Diagram.png</code></li><li><code>out/docs/group/join/join_group_sequence/Tham gia nhóm bằng QR code - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='roi-nhom'>
+<h3>Rời nhóm</h3>
+<p>Thành viên rời khỏi nhóm mà không cần bị xóa.</p>
+<p><span class='label'>Actor:</span> Thành viên nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người dùng là thành viên nhóm.</li><li>Không phải trưởng nhóm.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Xóa bản ghi membership của người dùng, phát sự kiện member_removed.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng chọn rời nhóm; frontend gửi <code>POST /groups/:groupId/leave</code>.</li><li>Service tìm nhóm, xác thực người dùng là thành viên và không phải LEADER.</li><li>Xóa bản ghi group_member tương ứng.</li><li>Phát sự kiện <code>member_removed</code>/<code>group_member_removed</code> tới các thành viên.</li><li>Trả 204 No Content; frontend thông báo rời nhóm thành công.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Nhóm không tồn tại hoặc người dùng không phải thành viên:</strong><ol><li>Trả 404 Not Found.</li></ol></li><li><strong>Trưởng nhóm muốn rời nhóm:</strong><ol><li>Trả 403 Forbidden và yêu cầu chuyển quyền trước.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/group/leave/leave_group_activity.puml</code></li><li><code>docs/group/leave/leave_group_sequence.puml</code></li><li><code>out/docs/group/leave/leave_group_activity/Rời nhóm - Activity Diagram.png</code></li><li><code>out/docs/group/leave/leave_group_sequence/Rời nhóm - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='xoa-thanh-vien'>
+<h3>Xóa thành viên khỏi nhóm</h3>
+<p>Loại bỏ thành viên khỏi nhóm bởi người có quyền.</p>
+<p><span class='label'>Actor:</span> Trưởng nhóm, Phó nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người yêu cầu có quyền xóa; nhóm và thành viên tồn tại.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Bản ghi thành viên bị xóa; các thành viên nhận thông báo bị xóa.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Chọn thành viên cần xóa; gửi <code>POST /groups/:groupId/members/:userId/kick</code>.</li><li>Service lấy thông tin nhóm và thành viên yêu cầu/đích.</li><li>Xác thực người yêu cầu là thành viên và có quyền với vai trò của người bị xóa.</li><li>Xóa bản ghi group_member của người bị xóa.</li><li>Phát sự kiện <code>member_removed</code>/<code>group_member_removed</code> qua WebSocket/EventService.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Nhóm không tồn tại:</strong><ol><li>Trả 404 Not Found.</li></ol></li><li><strong>Người yêu cầu không phải thành viên:</strong><ol><li>Trả 403 Forbidden.</li></ol></li><li><strong>Người bị xóa không tồn tại:</strong><ol><li>Trả 404 Not Found.</li></ol></li><li><strong>Tự xóa chính mình bằng use case này:</strong><ol><li>Trả 400 Bad Request; hướng dẫn dùng chức năng rời nhóm.</li></ol></li><li><strong>Không thể xóa trưởng nhóm:</strong><ol><li>Trả 403 Forbidden.</li></ol></li><li><strong>Xóa phó nhóm nhưng người yêu cầu không phải trưởng nhóm:</strong><ol><li>Trả 403 Forbidden.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/group/remove/remove_member_activity.puml</code></li><li><code>docs/group/remove/remove_member_sequence.puml</code></li><li><code>out/docs/group/remove/remove_member_activity/Xóa thành viên khỏi nhóm - Activity Diagram.png</code></li><li><code>out/docs/group/remove/remove_member_sequence/Xóa thành viên khỏi nhóm - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='cap-nhat-nhom'>
+<h3>Cập nhật thông tin/avatar nhóm</h3>
+<p>Chỉnh sửa tên nhóm hoặc avatar.</p>
+<p><span class='label'>Actor:</span> Trưởng nhóm, Phó nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người thực hiện có quyền cập nhật.</li><li>Nhóm tồn tại.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Thông tin nhóm được cập nhật, các thành viên nhận sự kiện group_updated.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Nhập thông tin mới; frontend gửi <code>PATCH /groups/:id</code> (có thể kèm file avatar).</li><li>Service kiểm tra quyền cập nhật dựa trên membership.</li><li>Cập nhật tên/avatar (nếu có) trong DB, upload file nếu kèm avatar.</li><li>Phát sự kiện <code>group_updated</code> qua Gateway và EventService.</li><li>Trả về nhóm đã cập nhật.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Không có quyền cập nhật:</strong><ol><li>Trả 403 Forbidden.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/group/update/update_group_activity.puml</code></li><li><code>docs/group/update/update_group_sequence.puml</code></li><li><code>out/docs/group/update/update_group_activity/Cập nhật thông tin nhóm - Activity Diagram.png</code></li><li><code>out/docs/group/update/update_group_sequence/Cập nhật thông tin nhóm - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='phan-quyen'>
+<h3>Phân quyền vai trò</h3>
+<p>Thay đổi vai trò thành viên (LEADER/CO_LEADER/MEMBER).</p>
+<p><span class='label'>Actor:</span> Trưởng nhóm, Phó nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người thực hiện có quyền phân quyền.</li><li>Thành viên mục tiêu tồn tại.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Vai trò thành viên được cập nhật; sự kiện role_changed được phát cho nhóm.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Chọn thành viên và vai trò mới; gửi <code>PATCH /groups/:groupId/members/:userId/role</code>.</li><li>Service xác thực quyền phân quyền và tìm thành viên.</li><li>Nếu nâng lên LEADER và người yêu cầu là trưởng nhóm hiện tại: chuyển trưởng nhóm cũ thành CO_LEADER rồi gán LEADER mới.</li><li>Các trường hợp khác: cập nhật role trực tiếp hoặc chuyển sang CO_LEADER khi người yêu cầu không đủ quyền làm LEADER.</li><li>Phát sự kiện <code>role_changed</code>/<code>group_role_changed</code>; trả về thành viên sau cập nhật.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Không có quyền phân quyền:</strong><ol><li>Trả 403 Forbidden.</li></ol></li><li><strong>Thành viên không tồn tại:</strong><ol><li>Trả 404 Not Found.</li></ol></li><li><strong>Cấp LEADER khi người yêu cầu không phải trưởng nhóm:</strong><ol><li>Giới hạn xuống CO_LEADER hoặc trả 403 tùy logic trong service.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/group/permission/permission_activity.puml</code></li><li><code>docs/group/permission/permission_sequence.puml</code></li><li><code>out/docs/group/permission/permission_activity/Phân quyền trong nhóm - Activity Diagram.png</code></li><li><code>out/docs/group/permission/permission_sequence/Phân quyền trong nhóm - Sequence Diagram.png</code></li></ul>
+</div>
+<div class='usecase' id='giai-tan-nhom'>
+<h3>Giải tán nhóm</h3>
+<p>Xóa toàn bộ thành viên và giải tán nhóm bởi trưởng nhóm.</p>
+<p><span class='label'>Actor:</span> Trưởng nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người yêu cầu là trưởng nhóm.</li><li>Nhóm tồn tại.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Các bản ghi membership bị xóa, nhóm bị xóa; gửi thông báo giải tán tới các thành viên.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Trưởng nhóm chọn giải tán; frontend gửi <code>POST /groups/:groupId/dissolve</code>.</li><li>Service lấy danh sách thành viên và xác nhận requester là LEADER.</li><li>Xóa các bản ghi group_member, sau đó xóa nhóm.</li><li>Phát sự kiện <code>group_dissolved</code> tới từng thành viên và qua EventService.</li><li>Trả 204 No Content.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Không phải trưởng nhóm:</strong><ol><li>Trả 403 Forbidden.</li></ol></li><li><strong>Nhóm không tồn tại:</strong><ol><li>Trả 404 Not Found.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/group/dissolve/dissolve_group_activity.puml</code></li><li><code>docs/group/dissolve/dissolve_group_sequence.puml</code></li><li><code>out/docs/group/dissolve/dissolve_group_activity/Giải tán nhóm - Activity Diagram.png</code></li><li><code>out/docs/group/dissolve/dissolve_group_sequence/Giải tán nhóm - Sequence Diagram.png</code></li></ul>
+</div>
+<h2 id='direct-chat'>Chat trực tiếp</h2>
+<div class='usecase' id='danh-sach-cuoc-tro-chuyen'>
+<h3>Xem danh sách cuộc trò chuyện</h3>
+<p>Liệt kê các cuộc trò chuyện (cá nhân và nhóm) mà người dùng tham gia.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Đã đăng nhập, WebSocket /message đã kết nối.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Hiển thị danh sách conversation cùng thông tin mới nhất.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng mở màn hình chat; frontend gọi <code>GET /messages/conversations</code>.</li><li>MessageService truy vấn danh sách cuộc trò chuyện liên quan.</li><li>Trả về dữ liệu để hiển thị.</li></ol>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/activity/chat-direct-activity-diagram.puml</code></li><li><code>docs/uml/sequence/chat-direct-sequence-diagram.puml</code></li></ul>
+</div>
+<div class='usecase' id='xem-lich-su-chat-ca-nhan'>
+<h3>Xem lịch sử chat cá nhân</h3>
+<p>Xem lại lịch sử tin nhắn giữa hai người dùng.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Đã đăng nhập và có quyền xem cuộc trò chuyện.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Hiển thị lịch sử tin nhắn với người dùng được chọn.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Chọn người nhận; frontend gọi <code>GET /messages/user/:userId</code>.</li><li>Service truy vấn lịch sử tin nhắn và trả về cho frontend hiển thị.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Không tìm thấy người dùng/không có quyền:</strong><ol><li>Trả lỗi phù hợp (404/403) tùy điều kiện kiểm tra quyền.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/sequence/chat-direct-sequence-diagram.puml</code></li></ul>
+</div>
+<div class='usecase' id='gui-tin-nhan-ca-nhan'>
+<h3>Gửi tin nhắn cá nhân (kèm file)</h3>
+<p>Gửi tin nhắn văn bản hoặc file tới người dùng khác và đồng bộ thời gian thực.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Hai bên có thể nhắn tin cho nhau (bạn bè hoặc cho phép chat).</li><li>JWT hợp lệ trên REST và WebSocket.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Tin nhắn được lưu DB, người gửi và người nhận nhận sự kiện <code>newMessage</code>.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng nhập nội dung và gửi <code>POST /messages/user</code> (JSON hoặc FormData nếu có file).</li><li>Nếu có file: upload qua StorageService và lấy URL.</li><li>Lưu tin nhắn vào DB với metadata file (nếu có).</li><li>MessageGateway phát <code>newMessage</code> tới phòng cá nhân của người gửi và người nhận.</li><li>API trả về tin nhắn đã lưu; frontend hiển thị ngay.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>File không hợp lệ hoặc lưu thất bại:</strong><ol><li>Trả lỗi phù hợp (400/500) và không lưu tin nhắn.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/sequence/chat-direct-sequence-diagram.puml</code></li></ul>
+</div>
+<div class='usecase' id='dang-go-ca-nhan'>
+<h3>Trạng thái đang gõ - cá nhân</h3>
+<p>Thông báo trạng thái đang gõ/đã dừng giữa hai người dùng.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>WebSocket /message đã kết nối.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Người nhận nhìn thấy/ẩn trạng thái đang gõ của người gửi.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Khi bắt đầu gõ: frontend phát sự kiện WebSocket <code>typing</code> kèm <em>receiverId</em>.</li><li>Gateway xác định userId từ socket và broadcast <code>userTyping</code> tới phòng <code>user:receiverId</code>.</li><li>Khi dừng gõ: phát sự kiện <code>stopTyping</code>; gateway broadcast <code>userTypingStopped</code> để ẩn trạng thái.</li></ol>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/sequence/chat-direct-sequence-diagram.puml</code></li></ul>
+</div>
+<div class='usecase' id='da-doc-ca-nhan'>
+<h3>Đánh dấu đã đọc - cá nhân</h3>
+<p>Cập nhật trạng thái đã đọc tin nhắn cá nhân và thông báo cho người gửi.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Tin nhắn tồn tại và thuộc cuộc trò chuyện của người dùng.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Tin nhắn được đánh dấu đã đọc; người gửi nhận sự kiện <code>messageRead</code>.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Frontend gọi <code>PATCH /messages/read/:messageId</code> khi người dùng xem tin nhắn.</li><li>Service cập nhật trạng thái đã đọc trong DB.</li><li>Gateway phát <code>messageRead</code> tới phòng của người gửi (và người nhận).</li><li>API trả về bản ghi đã cập nhật; UI hiển thị trạng thái đã đọc.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Tin nhắn không tồn tại:</strong><ol><li>Trả 404 Not Found.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/sequence/chat-direct-sequence-diagram.puml</code></li></ul>
+</div>
+<div class='usecase' id='thu-hoi-ca-nhan'>
+<h3>Thu hồi tin nhắn cá nhân</h3>
+<p>Thu hồi tin nhắn đã gửi và đồng bộ tới cả hai phía.</p>
+<p><span class='label'>Actor:</span> Người gửi</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Tin nhắn thuộc người gửi và cho phép thu hồi.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Tin nhắn có trạng thái thu hồi; cả hai phía nhận sự kiện <code>messageRecalled</code>.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người gửi chọn thu hồi; frontend gọi <code>PATCH /messages/recall/:messageId</code>.</li><li>Service cập nhật trạng thái thu hồi trong DB.</li><li>Gateway phát <code>messageRecalled</code> tới hai bên.</li><li>API trả về tin nhắn đã cập nhật.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Tin nhắn không tìm thấy hoặc không thuộc người gửi:</strong><ol><li>Trả lỗi phù hợp (404/403).</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/sequence/chat-direct-sequence-diagram.puml</code></li></ul>
+</div>
+<div class='usecase' id='reaction-ca-nhan'>
+<h3>Thêm reaction cho tin nhắn</h3>
+<p>Gắn reaction vào tin nhắn và đồng bộ tới các bên liên quan.</p>
+<p><span class='label'>Actor:</span> Người dùng</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Tin nhắn tồn tại trong cuộc trò chuyện của người dùng.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Reaction được lưu và sự kiện <code>messageReaction</code> gửi đến hai bên.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Người dùng chọn reaction; frontend gửi <code>POST /messages/reaction</code>.</li><li>Service lưu reaction vào DB.</li><li>Gateway phát <code>messageReaction</code> tới người gửi và người nhận.</li><li>API trả về reaction đã tạo; UI cập nhật.</li></ol>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/sequence/chat-direct-sequence-diagram.puml</code></li></ul>
+</div>
+<h2 id='group-chat'>Chat nhóm</h2>
+<div class='usecase' id='xem-lich-su-chat-nhom'>
+<h3>Xem lịch sử chat nhóm</h3>
+<p>Hiển thị lịch sử tin nhắn của một nhóm cụ thể.</p>
+<p><span class='label'>Actor:</span> Thành viên nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người dùng là thành viên nhóm.</li><li>WebSocket /message và /groups đã kết nối để nhận realtime.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Hiển thị lịch sử tin nhắn nhóm, sẵn sàng nhận thêm tin nhắn mới.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Chọn nhóm; frontend gọi <code>GET /messages/group/:groupId</code>.</li><li>Service kiểm tra quyền thành viên và truy vấn lịch sử.</li><li>Trả về dữ liệu để hiển thị.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Không phải thành viên hoặc nhóm không tồn tại:</strong><ol><li>Trả lỗi 403/404.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/activity/chat-group-activity-diagram.puml</code></li><li><code>docs/uml/sequence/chat-group-sequence-diagram.puml</code></li></ul>
+</div>
+<div class='usecase' id='gui-tin-nhan-nhom'>
+<h3>Gửi tin nhắn nhóm (kèm file)</h3>
+<p>Gửi tin nhắn văn bản hoặc media tới nhóm, đảm bảo đồng bộ cho mọi thành viên.</p>
+<p><span class='label'>Actor:</span> Thành viên nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Người gửi là thành viên nhóm và được phép gửi tin nhắn.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Tin nhắn nhóm được lưu; sự kiện <code>newMessage</code> phát tới phòng group và người gửi.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Nhập nội dung và gửi <code>POST /messages/group</code> (JSON/FormData).</li><li>Service kiểm tra quyền thành viên; upload file nếu có.</li><li>Lưu tin nhắn vào DB kèm URL media nếu có.</li><li>MessageGateway phát <code>newMessage</code> tới phòng <code>group:groupId</code> và phòng cá nhân của người gửi.</li><li>API trả về tin nhắn; frontend hiển thị cho tất cả thành viên (qua realtime).</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Không phải thành viên:</strong><ol><li>Trả 403 Forbidden.</li></ol></li><li><strong>File không hợp lệ:</strong><ol><li>Trả lỗi 400 và không lưu tin nhắn.</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/sequence/chat-group-sequence-diagram.puml</code></li></ul>
+</div>
+<div class='usecase' id='dang-go-nhom'>
+<h3>Trạng thái đang gõ - nhóm</h3>
+<p>Phát trạng thái đang gõ trong phòng nhóm.</p>
+<p><span class='label'>Actor:</span> Thành viên nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>WebSocket /message đã kết nối và user thuộc phòng nhóm.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Các thành viên khác thấy/ẩn trạng thái đang gõ của người gửi.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Bắt đầu gõ: frontend gửi sự kiện <code>typing</code> với <em>groupId</em>.</li><li>Gateway broadcast <code>userTyping</code> tới phòng <code>group:groupId</code>.</li><li>Dừng gõ: gửi <code>stopTyping</code>; gateway broadcast <code>userTypingStopped</code>.</li></ol>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/sequence/chat-group-sequence-diagram.puml</code></li></ul>
+</div>
+<div class='usecase' id='da-doc-nhom'>
+<h3>Đánh dấu đã đọc - nhóm</h3>
+<p>Đánh dấu và đồng bộ trạng thái đọc tin nhắn trong nhóm.</p>
+<p><span class='label'>Actor:</span> Thành viên nhóm</p>
+<p class='label'>Tiền điều kiện</p>
+<ul><li>Tin nhắn thuộc nhóm và người dùng là thành viên.</li></ul>
+<p class='label'>Hậu điều kiện</p>
+<ul><li>Tin nhắn cập nhật trạng thái đã đọc; broadcast tới các thành viên.</li></ul>
+<p class='label'>Luồng chính</p>
+<ol><li>Frontend gọi <code>PATCH /messages/read/:messageId</code> khi thành viên đọc tin nhắn nhóm.</li><li>Service cập nhật trạng thái đã đọc trong DB.</li><li>Gateway phát <code>messageRead</code> tới phòng <code>group:groupId</code> và UI cập nhật.</li></ol>
+<p class='label'>Ngoại lệ/nhánh phụ</p>
+<ul><li><strong>Tin nhắn không tồn tại hoặc người dùng không thuộc nhóm:</strong><ol><li>Trả lỗi phù hợp (404/403).</li></ol></li></ul>
+<p class='label diagrams'>Tài liệu tham chiếu</p>
+<ul><li><code>docs/uml/sequence/chat-group-sequence-diagram.puml</code></li></ul>
+</div>
+</body></html>

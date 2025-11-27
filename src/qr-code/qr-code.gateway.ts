@@ -1,3 +1,4 @@
+// Ghi chú: Gateway WebSocket phục vụ realtime cho module Qr Code.
 import { Server, Socket } from 'socket.io';
 import {
   WebSocketGateway,

@@ -1,3 +1,4 @@
+// Ghi chú: Service chứa nghiệp vụ cốt lõi của module Qr Code, chịu trách nhiệm xử lý dữ liệu và gọi Prisma/Redis.
 import {
   Injectable,
   NotFoundException,

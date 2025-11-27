@@ -1,7 +1,7 @@
-import { PrismaClient, Gender, FriendStatus, DeviceType } from '@prisma/client';
-import { hash } from 'bcrypt';
+import { PrismaClient, Gender, FriendStatus, DeviceType } from '@prisma/client'; // Import Prisma và các enum cần dùng
+import { hash } from 'bcrypt'; // Sử dụng bcrypt để mã hóa mật khẩu mẫu
 
-const prisma = new PrismaClient();
+const prisma = new PrismaClient(); // Khởi tạo Prisma Client dùng chung cho toàn file
 
 // xóa dữ liệu hiện có
 async function deleteAllData() {
@@ -24,7 +24,7 @@ async function deleteAllData() {
   await prisma.userInfo.deleteMany({});
   await prisma.user.deleteMany({});
 
-  console.log('Dữ liệu đã được xóa thành công!');
+  console.log('Dữ liệu đã được xóa thành công!'); // Ghi log để chắc chắn môi trường seed đang sạch
 }
 
 // Hàm tạo ngày hết hạn sau một số ngày
@@ -35,19 +35,19 @@ function addDays(date: Date, days: number): Date {
 }
 
 async function main() {
-  // Tạo người dùng
+  // Tạo người dùng mẫu với ID cố định để dễ truy vết khi test
   const users = await createUsers();
 
-  // Tạo mối quan hệ bạn bè
+  // Thiết lập bảng bạn bè dựa trên danh sách người dùng ở trên
   await createFriendships(users);
 
-  // Tạo cài đặt người dùng
+  // Khởi tạo bảng user_settings với một vài cấu hình phổ biến
   await createUserSettings(users);
 }
 
 async function createUsers() {
   // Xóa dữ liệu hiện có để tránh lỗi unique constraint
-  // Delete in the correct order to respect foreign key constraints
+  // Xóa đúng thứ tự để tôn trọng ràng buộc khóa ngoại
   await prisma.userSetting.deleteMany({});
   await prisma.refreshToken.deleteMany({});
   await prisma.notification.deleteMany({});
@@ -67,6 +67,7 @@ async function createUsers() {
   await prisma.userInfo.deleteMany({});
   await prisma.user.deleteMany({});
 
+  // Danh sách người dùng mẫu kèm profile để seed thử nghiệm
   const userData = [
     {
       id: 'a1a0ae5b-070f-40c2-a07d-c61c06623e7a',
@@ -271,16 +272,16 @@ async function createUsers() {
     },
   ];
 
-  const createdUsers = [];
+  const createdUsers = []; // Lưu lại người dùng đã tạo để dùng cho các bước seed tiếp theo
 
   for (const user of userData) {
-    // First create the user with fixed ID
+    // Bước 1: tạo bản ghi trong bảng users với ID cố định
     const createdUser = await prisma.user.create({
       data: {
-        id: user.id, // Use the fixed ID
+        id: user.id, // Giữ nguyên ID cố định để dễ liên kết với bảng khác
         email: user.email,
         phoneNumber: user.phoneNumber,
-        passwordHash: await hash(user.password, 10),
+        passwordHash: await hash(user.password, 10), // Mã hóa mật khẩu trước khi lưu
         refreshTokens: {
           create: {
             token: `token-${user.email.split('@')[0]}`,
@@ -294,10 +295,10 @@ async function createUsers() {
       },
     });
 
-    // Then create the UserInfo with the same ID
+    // Bước 2: tạo userInfo tương ứng, dùng chung ID để làm khóa chính và khóa ngoại
     await prisma.userInfo.create({
       data: {
-        id: user.id, // Use the same ID for UserInfo
+        id: user.id, // Đồng bộ ID giữa 2 bảng để thuận tiện join
         fullName: user.fullName,
         dateOfBirth: user.dateOfBirth,
         gender: user.gender,
@@ -312,11 +313,12 @@ async function createUsers() {
     createdUsers.push(createdUser);
   }
 
-  return createdUsers;
+  return createdUsers; // Trả về danh sách người dùng đã tạo cho các bước seed kế tiếp
 }
 
 async function createFriendships(users: any[]) {
   // Giữ nguyên các mối quan hệ cũ
+  // Danh sách dưới bao gồm cả dữ liệu lịch sử và một vài quan hệ mới cho các user bổ sung
   const friendships = [
     // Các mối quan hệ cũ
     {
@@ -513,8 +515,9 @@ async function createFriendships(users: any[]) {
 }
 
 async function createUserSettings(users: any[]) {
-  await prisma.userSetting.deleteMany({});
+  await prisma.userSetting.deleteMany({}); // Dọn sạch bảng cài đặt để không trùng dữ liệu cũ
 
+  // Bộ cài đặt thông báo + dark mode cho một số người tiêu biểu
   const settings = [
     {
       userId: users[0].id,
@@ -573,9 +576,11 @@ async function createUserSettings(users: any[]) {
 
 main()
   .catch((e) => {
-    console.error(e);
+    console.error(e); // In lỗi seed để dễ debug
     process.exit(1);
   })
   .finally(async () => {
-    await prisma.$disconnect();
+    await prisma.$disconnect(); // Đảm bảo kết nối Prisma được đóng sau khi seed xong
   });
+
+// npm run seed -> lệnh thực thi file seed này

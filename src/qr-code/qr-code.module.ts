@@ -1,3 +1,4 @@
+// Ghi chú: Module NestJS dùng để khai báo controller, provider và import dependency cho module Qr Code.
 import { Module } from '@nestjs/common';
 import { QrCodeService } from './qr-code.service';
 import { QrCodeGateway } from './qr-code.gateway';

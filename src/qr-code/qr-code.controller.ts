@@ -1,3 +1,4 @@
+// Ghi chú: Tệp controller định nghĩa các endpoint REST/WebSocket cho module Qr Code, nhận request và gọi service tương ứng.
 // src/qr-code/qr-code.controller.ts
 import {
   Controller,

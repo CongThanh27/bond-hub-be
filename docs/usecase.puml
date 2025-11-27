@@ -1,0 +1,67 @@
+@startuml Use Case Diagram
+title Lược đồ Use Case
+
+left to right direction
+
+actor "User" as UserAuth
+actor "User" as UserContacts
+actor "User" as UserGroup
+actor "User" as UserDirect
+actor "User" as UserGroupChat
+actor "Nhóm trưởng" as Leader
+actor "Thành viên nhóm" as Member
+
+Leader --|> UserGroup
+Member --|> UserGroup
+
+rectangle "Xác thực" as Auth {
+  UserAuth --> (Đăng ký)
+  UserAuth --> (Đăng nhập)
+  UserAuth --> (Đăng xuất)
+}
+
+rectangle "Danh bạ & Bạn bè" as Contacts {
+  UserContacts --> (Đồng bộ danh bạ)
+  UserContacts --> (Tìm kiếm người dùng)
+  UserContacts --> (Gửi lời mời kết bạn)
+  UserContacts --> (Phản hồi lời mời kết bạn)
+  UserContacts --> (Hủy lời mời đã gửi)
+  UserContacts --> (Xem danh sách bạn bè)
+}
+
+rectangle "Quản lý nhóm" as GroupMgmt {
+  Leader --> (Tạo nhóm)
+  Leader --> (Mời thành viên vào nhóm)
+  UserGroup --> (Tham gia nhóm bằng link)
+  UserGroup --> (Tham gia nhóm bằng QR code)
+  Member --> (Rời nhóm) #line:gray
+  Leader --> (Xóa thành viên khỏi nhóm)
+  Leader --> (Cập nhật thông tin / avatar nhóm)
+  Leader --> (Phân quyền vai trò)
+  Leader --> (Giải tán nhóm)
+}
+
+rectangle "Chat trực tiếp" as DirectChat {
+  UserDirect --> (Xem danh sách cuộc trò chuyện)
+  UserDirect --> (Xem lịch sử chat cá nhân)
+  UserDirect --> (Gửi tin nhắn cá nhân)
+  (Gửi tin nhắn cá nhân) ..> (Đính kèm file cá nhân) : <<include>>
+  UserDirect --> (Trạng thái đang gõ - cá nhân)
+  UserDirect --> (Đánh dấu đã đọc - cá nhân)
+  UserDirect --> (Thu hồi tin nhắn cá nhân)
+  UserDirect --> (Thêm reaction tin nhắn)
+}
+
+rectangle "Chat nhóm" as GroupChat {
+  Member --> (Xem lịch sử chat nhóm)
+  Member --> (Gửi tin nhắn nhóm)
+  (Gửi tin nhắn nhóm) ..> (Đính kèm file nhóm) : <<include>>
+  Member --> (Trạng thái đang gõ - nhóm)
+  Member --> (Đánh dấu đã đọc - nhóm)
+}
+
+Auth -[hidden]-> Contacts
+Contacts -[hidden]-> GroupMgmt
+GroupMgmt -[hidden]-> DirectChat
+DirectChat -[hidden]-> GroupChat
+@enduml
