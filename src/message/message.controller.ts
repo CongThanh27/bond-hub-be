@@ -27,7 +27,7 @@ import { ForwardMessageDto } from './dtos/forward-message.dto';
 export class MessageController {
   constructor(private readonly messageService: MessageService) {}
 
-  @Get('/conversations')
+  @Get('/conversations')// Lấy danh sách cuộc trò chuyện
   async getConversationList(
     @Request() req: Request,
     @Query('page') page = 1,
@@ -38,7 +38,7 @@ export class MessageController {
     return this.messageService.getConversationList(requestUserId, page, limit);
   }
 
-  @Get('/group/:groupId')
+  @Get('/group/:groupId')// Lấy tin nhắn trong nhóm
   async getGroupMessages(
     @Request() req: Request,
     @Param('groupId') groupId: string,
@@ -48,7 +48,7 @@ export class MessageController {
     return this.messageService.getGroupMessages(requestUserId, groupId, page);
   }
 
-  @Get('/group/:groupId/search')
+  @Get('/group/:groupId/search')// Tìm kiếm tin nhắn trong nhóm
   async findMessagesInGroup(
     @Request() req: Request,
     @Param('groupId') groupId: string,
@@ -64,7 +64,7 @@ export class MessageController {
     );
   }
 
-  @Get('/user/:userIdB/search')
+  @Get('/user/:userIdB/search')// Tìm kiếm tin nhắn với người dùng khác
   async findMessagesInUser(
     @Request() req: Request,
     @Param('userIdB', ParseUUIDPipe) userIdB: string,
@@ -80,7 +80,7 @@ export class MessageController {
     );
   }
 
-  @Get('/user/:userIdB')
+  @Get('/user/:userIdB')// Lấy tin nhắn với người dùng khác
   async getUserMessages(
     @Request() req: Request,
     @Param('userIdB', ParseUUIDPipe) userIdB: string,
@@ -90,7 +90,7 @@ export class MessageController {
     return this.messageService.getUserMessages(requestUserId, userIdB, page);
   }
 
-  @Post('/user')
+  @Post('/user')// Tạo tin nhắn với người dùng khác
   @UseInterceptors(FilesInterceptor('files', 10)) // Allow up to 10 files
   async createUserMessage(
     @Body() messageBody: UserMessageDto,
@@ -109,7 +109,7 @@ export class MessageController {
     return createdMessage;
   }
 
-  @Post('/group')
+  @Post('/group')// Tạo tin nhắn trong nhóm
   @UseInterceptors(FilesInterceptor('files', 10)) // Allow up to 10 files
   async createGroupMessage(
     @Body() messageBody: GroupMessageDto,

@@ -386,7 +386,7 @@ export class MessageService {
   async createGroupMessageWithMedia(
     message: GroupMessageDto,
     files: Express.Multer.File[],
-    userId: string,
+    userId: string,// ID người gửi
   ) {
     // Validation: ensure the sender is the authenticated user
     if (message.senderId && message.senderId !== userId) {
@@ -405,7 +405,7 @@ export class MessageService {
       throw new ForbiddenException('You are not a member of this group');
     }
 
-    // If no files, use regular message creation
+    // Nếu không có file, dùng hàm tạo tin nhắn thông thường
     if (!files || files.length === 0) {
       return this.createGroupMessage(message, userId);
     }

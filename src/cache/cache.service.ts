@@ -7,6 +7,7 @@ export class CacheService {
   constructor(@Inject(CACHE_MANAGER) private cacheManager: Cache) {}
 
   async set(key: string, value: string, ttl: number = 60) {
+    console.log(`Setting cache key: ${key} with TTL: ${ttl}s`);
     await this.cacheManager.set(key, value, ttl * 1000);
   }
 

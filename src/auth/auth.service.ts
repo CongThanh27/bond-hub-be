@@ -71,13 +71,13 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    // Check device type restrictions
+    // Kiểm tra các phiên hoạt động của thiết bị
     const activeTokens = user.refreshTokens.filter(
-      (token) => !token.isRevoked && token.expiresAt > new Date(),
+      (token) => !token.isRevoked && token.expiresAt > new Date(),// lọc các token chưa bị thu hồi và còn hạn
     );
 
-    this.logger.debug(`Active sessions for user ${user.id}:`, {
-      activeTokens: activeTokens.map((token) => ({
+    this.logger.debug(`Active sessions for user ${user.id}:`, {// ghi log các phiên hoạt động
+      activeTokens: activeTokens.map((token) => ({// chỉ lấy một số trường để log
         deviceType: token.deviceType,
         deviceName: token.deviceName,
         expiresAt: token.expiresAt,
@@ -136,11 +136,11 @@ export class AuthService {
     const accessToken = this.jwtService.sign({
       sub: userId,
       deviceType: deviceInfo.deviceType,
-    });
+    });// tạo access token với payload chứa userId và deviceType
 
-    const refreshToken = uuidv4();
-    const refreshTokenExpiry = new Date();
-    refreshTokenExpiry.setDate(refreshTokenExpiry.getDate() + 30);
+    const refreshToken = uuidv4();// tạo một UUID làm refresh token
+    const refreshTokenExpiry = new Date();// đặt thời gian hết hạn cho refresh token
+    refreshTokenExpiry.setDate(refreshTokenExpiry.getDate() + 30);// hết hạn sau 30 ngày
 
     const refreshTokenRecord = await this.prisma.refreshToken.create({
       data: {
@@ -229,7 +229,7 @@ export class AuthService {
   }
 
   private generateOtp(): string {
-    return Math.floor(100000 + Math.random() * 900000).toString();
+    return Math.floor(100000 + Math.random() * 900000).toString();//tạo mã OTP 6 chữ số ngẫu nhiên
   }
 
   async initiateRegistration(data: InitiateRegistrationDto) {
@@ -263,11 +263,15 @@ export class AuthService {
 
     // Generate OTP and registration ID
     const otp = this.generateOtp();
-    const registrationId = uuidv4();
+    const registrationId = uuidv4();// tạo một UUID làm registrationId
 
     this.logger.debug('Generated registration data', { registrationId });
 
     // Store registration data and OTP in Redis
+    // Data được lưu trong Redis có dạng:
+    // Key: registration:<registrationId>
+    // Value: JSON.stringify({ email, phoneNumber })
+    // Expiry: 5 minutes (300 seconds)
     await this.cacheService.set(
       `registration:${registrationId}`,
       JSON.stringify(data),
@@ -363,8 +367,8 @@ export class AuthService {
     });
 
     // Clean up Redis data
-    await this.cacheService.del(`otp:${data.registrationId}`);
-    await this.cacheService.del(`registration:${data.registrationId}`);
+    // await this.cacheService.del(`otp:${data.registrationId}`);
+    // await this.cacheService.del(`registration:${data.registrationId}`);
 
     return {
       message: 'Registration completed successfully',
@@ -465,7 +469,7 @@ export class AuthService {
 
   async resetPassword(resetId: string, newPassword: string) {
     // Get reset data
-    const resetData = await this.cacheService.get(`reset:${resetId}`);
+    const resetData = await this.cacheService.get(`reset:${resetId}`);// Lấy dữ liệu reset từ Redis
 
     if (!resetData) {
       throw new BadRequestException('Reset session expired');
@@ -483,8 +487,8 @@ export class AuthService {
     });
 
     // Clean up Redis data
-    await this.cacheService.del(`reset_otp:${resetId}`);
-    await this.cacheService.del(`reset:${resetId}`);
+    // await this.cacheService.del(`reset_otp:${resetId}`);
+    // await this.cacheService.del(`reset:${resetId}`);
 
     return {
       message: 'Password reset successfully',
@@ -789,8 +793,8 @@ export class AuthService {
     });
 
     // Clean up Redis data
-    await this.cacheService.del(`update_email_otp:${updateId}`);
-    await this.cacheService.del(`update_email:${updateId}`);
+    // await this.cacheService.del(`update_email_otp:${updateId}`);
+    // await this.cacheService.del(`update_email:${updateId}`);
 
     this.logger.log(`Email updated successfully for user ${userId}`);
     return {
@@ -824,8 +828,8 @@ export class AuthService {
     });
 
     // Clean up Redis data
-    await this.cacheService.del(`update_phone_otp:${updateId}`);
-    await this.cacheService.del(`update_phone:${updateId}`);
+    // await this.cacheService.del(`update_phone_otp:${updateId}`);
+    // await this.cacheService.del(`update_phone:${updateId}`);
 
     this.logger.log(`Phone number updated successfully for user ${userId}`);
     return {

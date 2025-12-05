@@ -18,8 +18,8 @@ import { FreestyleRequestDto } from './dto/freestyle-request.dto';
 export class AiService {
   private readonly logger = new Logger(AiService.name);
   private readonly genAI: GoogleGenerativeAI;
-  private readonly defaultModel = 'gemini-2.0-flash';
-  private readonly flashModel = 'gemini-2.0-flash';
+  private readonly defaultModel = 'gemini-2.0-flash'; // Sử dụng model flash cho cả generate và streaming
+  private readonly flashModel = 'gemini-2.0-flash'; // Model nhanh hơn, phù hợp cho tóm tắt và nâng cao tin nhắn
 
   constructor(private configService: ConfigService) {
     const apiKey = this.configService.get<string>('GOOGLE_AI_API_KEY');
@@ -229,8 +229,8 @@ export class AiService {
       this.logger.log(`Summarizing text of length: ${text.length}`);
 
       // Calculate appropriate max length if not specified
-      const defaultMaxLength = Math.max(Math.floor(text.length * 0.3), 100);
-      const maxLengthValue = maxLength ? parseInt(maxLength) : defaultMaxLength;
+      const defaultMaxLength = Math.max(Math.floor(text.length * 0.3), 100);// Mặc định là 30% độ dài văn bản gốc, tối thiểu 100 ký tự
+      const maxLengthValue = maxLength ? parseInt(maxLength) : defaultMaxLength;// Chuyển đổi maxLength sang số nguyên nếu được cung cấp
 
       // Get the model for summarization (using flash model for faster response)
       const model = this.genAI.getGenerativeModel({
@@ -319,12 +319,12 @@ LANGUAGE: Write in Vietnamese if original text is Vietnamese, English if origina
 
       for (const prefix of unwantedPrefixes) {
         if (summary.toLowerCase().startsWith(prefix.toLowerCase())) {
-          summary = summary.substring(prefix.length).trim();
+          summary = summary.substring(prefix.length).trim();// Loại bỏ tiền tố không mong muốn
         }
       }
 
       // Ensure summary doesn't exceed the max length
-      if (summary.length > maxLengthValue) {
+      if (summary.length > maxLengthValue) {// Nếu tóm tắt vượt quá độ dài tối đa
         this.logger.log(
           `Summary exceeds max length (${summary.length}/${maxLengthValue}), truncating...`,
         );
@@ -337,12 +337,12 @@ LANGUAGE: Write in Vietnamese if original text is Vietnamese, English if origina
                 {
                   text: `TASK: Shorten the text below to maximum ${maxLengthValue} characters while preserving the main meaning.
 
-RULES:
-- Return ONLY the shortened content
-- NO introductions or comments
-- Maximum ${maxLengthValue} characters
+                  RULES:
+                  - Return ONLY the shortened content
+                  - NO introductions or comments
+                  - Maximum ${maxLengthValue} characters
 
-TEXT TO SHORTEN:\n${summary}`,
+                  TEXT TO SHORTEN:\n${summary}`,
                 },
               ],
             },
@@ -382,37 +382,37 @@ TEXT TO SHORTEN:\n${summary}`,
 
       // Get the model for enhancing messages
       const model = this.genAI.getGenerativeModel({
-        model: this.flashModel,
-        safetySettings: [
+        model: this.flashModel,// lây model flash để tăng tốc độ phản hồi
+        safetySettings: [ //An toàn nội dung
           {
-            category: HarmCategory.HARM_CATEGORY_HARASSMENT,
+            category: HarmCategory.HARM_CATEGORY_HARASSMENT,//Phân loại quấy rối
             threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
           },
           {
-            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,
+            category: HarmCategory.HARM_CATEGORY_HATE_SPEECH,//Phân loại ngôn ngữ thù địch
             threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
           },
           {
-            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,
+            category: HarmCategory.HARM_CATEGORY_SEXUALLY_EXPLICIT,//Phân loại nội dung khiêu dâm
             threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
           },
           {
-            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,
+            category: HarmCategory.HARM_CATEGORY_DANGEROUS_CONTENT,//Phân loại nội dung nguy hiểm
             threshold: HarmBlockThreshold.BLOCK_MEDIUM_AND_ABOVE,
           },
         ],
       });
 
-      // Prepare context instructions
+      // Chuẩn bị hướng dẫn ngữ cảnh
       let contextInstructions = '';
-      if (previousMessages && previousMessages.length > 0) {
-        contextInstructions = '\n\nConversation context:\n';
+      if (previousMessages && previousMessages.length > 0) {// Nếu có tin nhắn trước đó
+        contextInstructions = '\n\nConversation context:\n';// Thêm ngữ cảnh cuộc trò chuyện
         previousMessages.forEach((msg) => {
-          contextInstructions += `${msg.senderName} (${msg.type}): ${msg.content}\n`;
+          contextInstructions += `${msg.senderName} (${msg.type}): ${msg.content}\n`;// Thêm từng tin nhắn vào ngữ cảnh
         });
       }
 
-      // System instructions in English for better AI comprehension
+      // Hướng dẫn hệ thống bằng tiếng Anh để AI hiểu tốt hơn
       const systemInstructions = `PROFESSIONAL MESSAGE ENHANCEMENT
 
 MANDATORY RULES:
@@ -442,11 +442,11 @@ ENHANCEMENT TECHNIQUES:
 LANGUAGE: Keep the same language as the original message (Vietnamese or English).`;
 
       // Generate enhanced message
-      const result = await model.generateContent({
+      const result = await model.generateContent({// Tạo nội dung
         contents: [
           {
-            role: 'user',
-            parts: [
+            role: 'user',// Vai trò người dùng
+            parts: [// Phần nội dung
               {
                 text: `${systemInstructions}\n\nMESSAGE TO ENHANCE:\n"${message}"${contextInstructions}`,
               },
@@ -474,17 +474,17 @@ LANGUAGE: Keep the same language as the original message (Vietnamese or English)
       ];
 
       for (const prefix of unwantedPrefixes) {
-        if (enhancedMessage.toLowerCase().startsWith(prefix.toLowerCase())) {
-          enhancedMessage = enhancedMessage.substring(prefix.length).trim();
+        if (enhancedMessage.toLowerCase().startsWith(prefix.toLowerCase())) {// Nếu tin nhắn bắt đầu với tiền tố không mong muốn
+          enhancedMessage = enhancedMessage.substring(prefix.length).trim();// Loại bỏ tiền tố không mong muốn
         }
       }
 
       // Remove quotes if the entire message is wrapped in quotes
-      if (enhancedMessage.startsWith('"') && enhancedMessage.endsWith('"')) {
-        enhancedMessage = enhancedMessage.slice(1, -1).trim();
+      if (enhancedMessage.startsWith('"') && enhancedMessage.endsWith('"')) {// Nếu tin nhắn được bao quanh bởi dấu ngoặc kép
+        enhancedMessage = enhancedMessage.slice(1, -1).trim();// Loại bỏ dấu ngoặc kép
       }
-      if (enhancedMessage.startsWith("'") && enhancedMessage.endsWith("'")) {
-        enhancedMessage = enhancedMessage.slice(1, -1).trim();
+      if (enhancedMessage.startsWith("'") && enhancedMessage.endsWith("'")) {// Nếu tin nhắn được bao quanh bởi dấu ngoặc đơn
+        enhancedMessage = enhancedMessage.slice(1, -1).trim();// Loại bỏ dấu ngoặc đơn
       }
 
       return { enhancedMessage };
