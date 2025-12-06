@@ -19,9 +19,9 @@ export class QrCodeService {
   ) {}
 
   async generateQrCode() {
-    const qrToken = Math.random().toString(36).substring(2, 15);
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
-
+    const qrToken = Math.random().toString(36).substring(2, 15);// Tạo một chuỗi ngẫu nhiên (qrToken) bằng Math.random().
+    const expiresAt = new Date(Date.now() + 5 * 60 * 1000);// Thiết lập thời gian hết hạn (expiresAt) là 5 phút kể từ thời điểm tạo.
+    // Lưu thông tin mã QR vào bảng QrCode trong cơ sở dữ liệu thông qua prisma.qrCode.create với trạng thái ban đầu là PENDING.
     const qrCode = await this.prisma.qrCode.create({
       data: {
         qrToken,
@@ -30,14 +30,15 @@ export class QrCodeService {
       },
     });
 
-    return { qrToken: qrCode.qrToken, expires_in: 300 };
+    return { qrToken: qrCode.qrToken, expires_in: 300 };// Trả về: Đối tượng chứa qrToken và thời gian hết hạn (tính bằng giây) để client hiển thị mã QR.
   }
 
-  async getQrStatus(qrToken: string) {
+  async getQrStatus(qrToken: string) {// Lấy trạng thái hiện tại của mã QR dựa trên qrToken.
     const qrCode = await this.findAndValidateQrCode(qrToken);
     return { status: qrCode.status };
   }
 
+  //Xử lý khi mã QR được quét
   async scanQrCode(qrToken: string, userId: string) {
     // Validate the QR token exists and is valid
     const qrCode = await this.findAndValidateQrCode(qrToken);
@@ -86,6 +87,7 @@ export class QrCodeService {
   }
 
   async confirmQrCode(qrToken: string, userId: string) {
+    console.log(`Confirming QR code with token: ${qrToken} for user ID: ${userId}`);
     const qrCode = await this.findAndValidateQrCode(qrToken);
 
     if (qrCode.status !== QrCodeStatus.SCANNED) {
@@ -139,6 +141,7 @@ export class QrCodeService {
       device: deviceInfo,
     };
 
+    console.log(`Login data prepared for QR code confirmation: ${JSON.stringify(loginData)}`);
     this.qrCodeGateway.sendQrStatus(
       qrCode.qrToken,
       QrCodeStatus.CONFIRMED,
@@ -146,7 +149,7 @@ export class QrCodeService {
       loginData,
     );
 
-    await this.deleteQrCode(qrCode.qrToken);
+    // await this.deleteQrCode(qrCode.qrToken);
     return { status: QrCodeStatus.CONFIRMED };
   }
 

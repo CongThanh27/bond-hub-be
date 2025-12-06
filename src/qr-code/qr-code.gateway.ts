@@ -81,13 +81,14 @@ export class QrCodeGateway implements OnGatewayConnection, OnGatewayDisconnect {
       }
     });
   }
-
+// Gửi trạng thái QR code đến tất cả các kết nối liên quan
   sendQrStatus(
     qrToken: string,
     status: string,
     userData?: UserData,
     loginData?: LoginData,
   ): void {
+    console.log(`Sending QR status update for token: ${qrToken}, status: ${status}`);
     this.server.emit(`qr-status-${qrToken}`, {
       status,
       userData,
